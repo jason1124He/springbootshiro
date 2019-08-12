@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunppenergy.dao.SysUserDao">
+
+    <resultMap id="userMap" type="com.sunppenergy.entity.SysUserEntity">
+        <id property="id" column="id"/>
+        <result property="userName" column="userName"/>
+        <result property="realName" column="realName"/>
+        <result property="password" column="password"/>
+        <result property="phone" column="phone"/>
+        <collection property="roles" ofType="com.sunppenergy.entity.SysRoleEntity">
+            <id property="id" column="roleId"/>
+            <result property="name" column="roleName"/>
+            <collection property="auths" ofType="com.sunppenergy.entity.SysAuthEntity">
+                <id property="id" column="authId"/>
+                <result property="name" column="authName"/>
+                <result property="url" column="url"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+
+    <select id="findUserById" resultMap="userMap" parameterType="int">
+        SELECT
+            su.id id,
+            su.`user_name` userName,
+            su.real_name realName,
+            su.`password` `password`,
+            sr.id roleId,
+            sr.`name` roleName,
+            sa.id authId,
+            sa.`name` authName,
+            sa.url url
+        FROM
+            sys_user su,
+            sys_role sr,
+            user_role ur,
+            role_auth ra,
+            sys_auth sa
+        WHERE
+            su.id = #{userId}
+            AND ur.user_id = su.id
+            AND ur.role_id = sr.id
+            AND ur.role_id = ra.role_id
+            AND sa.id = ra.auth_id
+            AND su.delete_flag = 0
+            AND sa.delete_flag = 0
+            AND sr.delete_flag = 0
+    </select>
+
+</mapper>
